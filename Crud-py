@@ -1,0 +1,292 @@
+#=====Starting a New Project==============
+      #import package
+from tkinter import*
+from tkinter import ttk
+import tkinter.messagebox
+import pymysql   #first u should insta;ll mysql pip install PyMySQL
+import pyodbc #pip install pyodbc
+#connection = pyodbc.connect('Driver={SQL Server};' 'Server=DESKTOP-HVHS829\SQLEXPRESS;'
+                          #  'Database=Trainer;' 'Trusted_connection=yes;')
+root=Tk()
+titlespace=" "
+root.title(102 * titlespace + "Mysql connector")
+root.geometry("800x700+300+0")
+root.resizable(width=False, height=False)
+#==========2Frame Design ==============
+Mainframe=Frame(root, bd=10, width=770, height=700, relief = RIDGE, bg='cadet blue')
+Mainframe.grid()
+#====================3Create a title=================================
+TitleFrame=Frame(Mainframe, bd=7,width=770, height=100,relief=RIDGE)
+TitleFrame.grid(row=0, column=0)
+
+Topframe=Frame(Mainframe, bd=5,width=770, height=500,relief=RIDGE)
+Topframe.grid(row=1, column=0)
+
+Leftframe=Frame(Topframe, bd=5,width=770, height=400,padx=2,bg='cadet blue',relief=RIDGE)
+Leftframe.pack(side=LEFT)
+
+Leftframe1=Frame(Leftframe, bd=5,width=600,height=180,padx=2,pady=4,relief=RIDGE)
+Leftframe1.pack(side=TOP,padx=0,pady=0)
+
+Rightframe=Frame(Topframe, bd=5,width=100,height=400,padx=2,bg='cadet blue',relief=RIDGE)
+Rightframe.pack(side=RIGHT)
+
+Rightframe1=Frame(Rightframe, bd=5,width=90,height=300,padx=2,pady=2,relief=RIDGE)
+Rightframe1.pack(side=TOP)
+#=======================================================7=Variables Declarations==============
+StudentID=StringVar()
+Firstname=StringVar()
+Surename=StringVar()
+Address=StringVar()
+Gender=StringVar()
+Mobile=StringVar()
+#=======================================================8=function Declarations=====call function in buttun=========
+def iExit():
+    iExit=tkinter.messagebox.askyesno("MYSQL connection","confirm if you wante to exit")
+    if iExit > 0:
+        root.destroy()
+    return
+    
+def Reset():
+    entStudentID.delete(0,END)
+    entFirstname.delete(0,END)
+    entSurename.delete(0,END)
+    entAdress.delete(0,END)
+    Gender.set("")
+    entMobile.delete(0,END)
+    
+def addData():
+    if StudentID.get() =="" or Firstname.get() =="" or Surename.get() =="":
+        tkinter.messagebox.showerror("mysql connection","enter correct Detaile")
+    else:
+        sqlcon=pymysql.connect(host = 'localhost', user='root', password=' ',database="Trainer")
+        cur=sqlconn.cursor()
+        cur.execute(" insert into Student values(%s,%s,%s,%s,%s)",(
+        StudentID.get(),
+        Firstname.get(),
+        Surename.get(),
+        Address.get(),
+        Gender.get(),
+        Mobile.get(),
+                 ))
+        sqlconn.commit()
+        sqlcon.close()
+        tkinter.messagebox.Showinfo("MYSQL connection","Record enter secssfully")
+def DisplayData():
+    sqlcon=pymysql.connect(host = "localhost",user="root",password="password",database="Trainer")
+    cur=sqlconn.cursor()
+    cur.execute(" Select from Student")
+    result=cur.fechall()
+    if len(result)!=0:
+        student_records.delete(*student_records.get_children())
+        for row in result:
+            student_records.insert('',END, values =row)                      
+    sqlconn.commit()
+    sqlcon.close()
+    
+def Traininfo(ev):
+    viewinfo=student_recoreds.focus()
+    learnerData = student_records.item(viewinfo)
+    row=learnerData['values']
+    StudentID.set(row[0])
+    Firstname.set(row[1])
+    Surename.set(row[2])
+    Address.set(row[3])
+    Gender.set(row[4])
+    Mobile.set(row[5])
+    
+def Update():
+    sqlcon=pymysql.connect(host = "localhost",user="root",password="password",database="Trainer")
+    cur=sqlconn.cursor()
+    cur.execute(" update Student set firstname=%s,Surename=%s,Address=%s,Gender=%s,Mobile=%s where stdid=%s",(
+    Firstname.get(),
+    Surename.get(),
+    Address.get(),
+    Gender.get(),
+    Mobile.get(),
+    StudentID.get(),
+    ))
+    sqlconn.commit()            
+    sqlcon.close()
+    tkinter.messagebox.Showinfo("Data Entry Form","Record Update secssfully")
+    Reset()
+    
+def DelateDB():
+    sqlcon=pymysql.connect(host = "localhost",user="root",password="password",database="Trainer")
+    cur=sqlconn.cursor()
+    cur.execute(" delet from Student sdid=%",StudentId.get())
+    sqlconn.commit()
+    DisplayData()
+    sqlcon.close()
+    tkinter.messagebox.Showinfo("Data Entry Form","Record secssfully Delated")
+    Reset()
+def SearchDB():
+    try:
+        sqlcon=pymysql.connect(host = "localhost",user="root",password="password",database="Trainer")
+        cur=sqlconn.cursor()
+        cur.execute("select * from Student where stdid=%s",StudentId.get())
+        row=cur.fechal()
+        StudentID.set(row[0])
+        Firstname.set(row[1])
+        Surename.set(row[2])
+        Address.set(row[3])
+        Gender.set(row[4])
+        Mobile.set(row[5])
+        
+        sqlconn.commit()
+    except:
+         tkinter.messagebox.Showinfo("Data Entry Form","No Such Record Found")
+    Reset()
+    sqlcon.close()
+
+#===========================4Creating Label, Entry and Comboxbox Widge========
+            
+lbltitle=Label(TitleFrame,font=('arirowal',40,'bold'),text="MYSQL Connection",bd=7)
+lbltitle.grid(row=0,column=0,padx=132)
+
+lblStudentID=Label(Leftframe1,font=('arial',12,'bold'),text="Student ID",bd=7)
+lblStudentID.grid(row=1,column=0, sticky=W,padx=5)
+entStudentID=Entry(Leftframe1,font=('arial',12,'bold'),bd=5,width=44,justify='left',textvariable=StudentID)
+entStudentID.grid(row=1,column=1, sticky=W,padx=5)
+
+lblFirstname=Label(Leftframe1,font=('arial',12,'bold'),text="Firstname",bd=7)
+lblFirstname.grid(row=2,column=0, sticky=W,padx=5)
+entFirstname=Entry(Leftframe1,font=('arial',12,'bold'),bd=5,width=44,justify='left',textvariable=Firstname)
+entFirstname.grid(row=2,column=1,sticky=W,padx=5)
+
+lblSuretname=Label(Leftframe1,font=('arial',12,'bold'),text="Firstname",bd=7)
+lblSuretname.grid(row=3,column=0, sticky=W,padx=5)
+entSurename=Entry(Leftframe1,font=('arial',12,'bold'),bd=5,width=44,justify='left',textvariable=Surename)
+entSurename.grid(row=3,column=1,sticky=W,padx=5)
+
+lblAdress=Label(Leftframe1,font=('arial',12,'bold'),text="Adress",bd=7)
+lblAdress.grid(row=4,column=0,sticky=W,padx=5)
+entAdress=Entry(Leftframe1,font=('arial',12,'bold'),bd=5,width=44,justify='left',textvariable=Address)
+entAdress.grid(row=4,column=1,sticky=W,padx=5)
+
+lblGender=Label(Leftframe1,font=('arial',12,'bold'),text="Gender",bd=7)
+lblGender.grid(row=5,column=0,sticky=W,padx=5)
+cboGender=ttk.Combobox(Leftframe1,font=('arial',12,'bold'),width=42,state='readonly',textvariable=Gender)
+cboGender['values']=(' ','Female','Male')
+cboGender.current(0)
+cboGender.grid(row=5,column=1)
+
+lblMobile=Label(Leftframe1,font=('arial',12,'bold'),text="Mobile",bd=7)
+lblMobile.grid(row=6,column=0,sticky=W,padx=5)
+entMobile=Entry(Leftframe1,font=('arial',12,'bold'),bd=5,width=44,justify='left',textvariable=Mobile)
+entMobile.grid(row=6,column=1,sticky=W,padx=5)
+#================================================5=Table treeview=======================================================
+scroll_y=Scrollbar(Leftframe, orient=VERTICAL)
+student_records=ttk.Treeview(Leftframe,height=12,columns=("stdid","firstname","surename","address","gender","mobile"),yscrollcommand=scroll_y.set)
+scroll_y.pack(side=RIGHT,fill=Y)
+
+student_records.heading("stdid",text="StudentID")
+student_records.heading("firstname",text="Firstname")
+student_records.heading("surename",text="surename")
+student_records.heading("address",text="Address")
+student_records.heading("gender",text="Gender")
+student_records.heading("mobile",text="Mobile")
+
+student_records['show']='headings'
+
+student_records.column("stdid",width=70)
+student_records.column("firstname",width=100)
+student_records.column("surename",width=100)
+student_records.column("address",width=100)
+student_records.column("gender",width=70)
+student_records.column("mobile",width=70)
+
+student_records.pack(fill=BOTH,expand=1)
+#student_records.bind("<ButtonRelase-1>",Traininfo) #after define function Info
+   
+#DisplayData() 
+            
+    #===============================================6==Button========================================================
+btnAddNew=Button(Rightframe1, font=('arial',12,'bold'),text="Add new",bd=4,pady=1,padx=24,width=8, height=2,command=addData).grid(row=0,columns=1,padx=1)
+btnDisplay=Button(Rightframe1, font=('arial',12,'bold'),text="Display",bd=4,pady=1,padx=24,width=8, height=2,command=DisplayData).grid(row=1,columns=1,padx=1)
+btnUpdate=Button(Rightframe1, font=('arial',12,'bold'),text="Update",bd=4,pady=1,padx=24,width=8, height=2,command=Update).grid(row=2,columns=1,padx=1)
+btnDelate=Button(Rightframe1, font=('arial',12,'bold'),text="Delate",bd=4,pady=1,padx=24,width=8, height=2,command=DelateDB).grid(row=3,columns=1,padx=1)
+btnSearch=Button(Rightframe1, font=('arial',12,'bold'),text="Search",bd=4,pady=1,padx=24,width=8, height=2,command=SearchDB).grid(row=4,columns=1,padx=1)
+btnReset=Button(Rightframe1, font=('arial',12,'bold'),text="Reset",bd=4,pady=1,padx=24,width=8, height=2,command=Reset).grid(row=5,columns=1,padx=1)
+btnExit=Button(Rightframe1, font=('arial',12,'bold'),text="Exit",bd=4,pady=1,padx=24,width=8, height=2,command=iExit).grid(row=6,columns=1,padx=1)
+ #=================================================================================================================
+root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
